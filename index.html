@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#153c35"><title>درس‌یار | برنامه‌ریز مدرسه</title>
+<link rel="manifest" href="manifest.webmanifest">
+<style>
+:root{--bg:#f4f7f6;--card:#fff;--ink:#18312d;--muted:#71817d;--green:#176b58;--mint:#e5f3ee;--orange:#e68a45;--line:#e4ebe8}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:Tahoma,Arial,sans-serif}
+header{background:linear-gradient(135deg,#153c35,#207864);color:white;padding:24px 18px 30px;border-radius:0 0 25px 25px}
+header h1{margin:0 0 7px;font-size:25px}header p{margin:0;color:#d4e9e2;font-size:13px}
+main{max-width:760px;margin:auto;padding:14px 13px 40px}
+.tabs{display:flex;gap:7px;overflow:auto;margin:-4px 0 14px}
+.tabs button{white-space:nowrap;border:0;border-radius:12px;padding:11px 14px;background:#e4ece8;color:var(--ink);font-weight:bold}
+.tabs button.active{background:var(--green);color:white}
+.panel{display:none}.panel.active{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:17px;padding:15px;margin-bottom:12px;box-shadow:0 4px 16px #173c3508}
+h2{font-size:17px;margin:0 0 12px}h3{font-size:14px;margin:0 0 8px}
+.small{font-size:12px;color:var(--muted);line-height:1.8}
+button,.btn{cursor:pointer;font-family:inherit}
+.primary{background:var(--green);color:#fff;border:0;border-radius:12px;padding:12px 15px;font-weight:bold}
+.secondary{background:var(--mint);color:var(--green);border:0;border-radius:12px;padding:11px 13px;font-weight:bold}
+input,textarea,select{width:100%;padding:12px;border:1px solid var(--line);border-radius:11px;font:inherit;background:#fff;color:var(--ink);margin:5px 0 10px}
+textarea{min-height:78px;resize:vertical}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.row{display:flex;align-items:center;gap:8px}.row>*:first-child{flex:1}
+.task{display:flex;align-items:flex-start;gap:10px;padding:12px 0;border-bottom:1px solid var(--line)}
+.task:last-child{border:0}.task input{width:20px;height:20px;margin:2px 0;accent-color:var(--green)}
+.task.done .taskname{text-decoration:line-through;color:#899792}
+.taskname{font-weight:bold;font-size:14px}.taskmeta{font-size:11px;color:var(--muted);margin-top:5px}
+.daytitle{background:var(--mint);color:var(--green);padding:9px 11px;border-radius:10px;font-weight:bold;margin:12px 0 3px}
+.badge{font-size:10px;background:#fff1e5;color:#a65b1d;border-radius:20px;padding:4px 7px}
+.empty{text-align:center;color:var(--muted);padding:20px 8px;font-size:13px}
+.note{background:#fff8ef;border:1px solid #f4e1ca;border-radius:12px;padding:11px;font-size:12px;line-height:1.8}
+footer{text-align:center;color:var(--muted);font-size:10px;padding:20px}
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+<header><h1>درس‌یار 📚</h1><p>تکالیف، یادداشت درس‌ها و برنامه روزانه در یک جا</p></header>
+<main>
+<nav class="tabs">
+<button class="active" data-tab="tasks">فعالیت‌ها</button><button data-tab="import">دریافت فایل</button><button data-tab="notes">یادداشت درس‌ها</button><button data-tab="planner">برنامه روزانه</button>
+</nav>
+<section id="tasks" class="panel active">
+<div class="card"><div class="row"><div><h2>فعالیت‌های هفته</h2><div class="small" id="progress">۰ فعالیت انجام‌شده</div></div><span class="badge">قابل ویرایش</span></div><div id="taskList"></div></div>
+<div class="card"><h2>افزودن فعالیت دستی</h2>
+<label class="small">نام درس</label><input id="taskSubject" placeholder="مثلاً ریاضی">
+<label class="small">شرح فعالیت</label><textarea id="taskTitle" placeholder="مثلاً حل تمرین صفحه ۴۲"></textarea>
+<div class="grid"><div><label class="small">روز</label><select id="taskDay"><option>شنبه</option><option>یکشنبه</option><option>دوشنبه</option><option>سه‌شنبه</option><option>چهارشنبه</option><option>پنجشنبه</option><option>جمعه</option></select></div><div><label class="small">موعد</label><input id="taskDate" type="date"></div></div>
+<button class="primary" id="addTask">افزودن به جدول</button></div>
+</section>
+<section id="import" class="panel">
+<div class="card"><h2>دریافت فعالیت از فایل واتساپ</h2>
+<p class="small">در واتساپ فایل PDF یا عکس فعالیت را باز کن، «اشتراک‌گذاری» را بزن و درس‌یار را انتخاب کن. یا فایل را همین‌جا انتخاب کن.</p>
+<input id="fileInput" type="file" accept="application/pdf,image/*" multiple>
+<button class="primary" id="processFiles">بررسی فایل‌های انتخاب‌شده</button>
+<div id="fileStatus" class="small" style="margin-top:10px"></div>
+<div id="extractResult"></div></div>
+<div class="note">نکته: متن PDF معمولی مستقیم خوانده می‌شود. برای PDF اسکن‌شده و عکس، برنامه از تشخیص متن فارسی استفاده می‌کند و ممکن است بعضی کلمات را اشتباه بخواند؛ قبل از افزودن، متن را بررسی و اصلاح کن.</div>
+</section>
+<section id="notes" class="panel">
+<div class="card"><h2>دفتر توضیحات درس‌ها</h2><label class="small">درس</label><input id="noteSubject" placeholder="مثلاً علوم"><label class="small">توضیحات و نکته‌ها</label><textarea id="noteText" placeholder="یادداشت‌های این درس..."></textarea><button class="primary" id="saveNote">ذخیره یادداشت</button></div>
+<div class="card"><h2>یادداشت‌های ذخیره‌شده</h2><div id="noteList"></div></div>
+</section>
+<section id="planner" class="panel">
+<div class="card"><h2>برنامه روزانه و یادآور</h2><label class="small">عنوان کار</label><input id="planTitle" placeholder="مثلاً مرور ریاضی یا پیاده‌روی"><div class="grid"><div><label class="small">ساعت</label><input id="planTime" type="time"></div><div><label class="small">تکرار</label><select id="planRepeat"><option value="once">فقط یک‌بار</option><option value="daily">هر روز</option></select></div></div><label class="small">نوع برنامه</label><select id="planType"><option>درسی</option><option>غیر درسی</option></select><button class="primary" id="addPlan">ثبت برنامه</button><button class="secondary" id="enableNotify" style="margin-right:6px">فعال‌کردن اعلان‌ها</button><p class="small">یادآوری این نسخه وقتی برنامه باز است کار می‌کند. برای آلارم مطمئن حتی وقتی برنامه بسته است، نسخه اندرویدی با مجوز اعلان و زمان‌بندی سیستم لازم است.</p></div>
+<div class="card"><h2>برنامه‌های ثبت‌شده</h2><div id="planList"></div></div>
+</section>
+<footer>درس‌یار • نسخه آزمایشی ۱ • اطلاعات روی همین دستگاه ذخیره می‌شود</footer>
+</main>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+<script>
+const $=id=>document.getElementById(id), days=['شنبه','یکشنبه','دوشنبه','سه‌شنبه','چهارشنبه','پنجشنبه','جمعه'];
+let data=JSON.parse(localStorage.getItem('darsyar_v1')||'{"tasks":[],"notes":[],"plans":[]}');
+const save=()=>localStorage.setItem('darsyar_v1',JSON.stringify(data));
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tabs button').forEach(x=>x.classList.toggle('active',x===b));document.querySelectorAll('.panel').forEach(x=>x.classList.toggle('active',x.id===b.dataset.tab));});
+function renderTasks(){let box=$('taskList');box.innerHTML='';let done=data.tasks.filter(t=>t.done).length;$('progress').textContent=`${done} از ${data.tasks.length} فعالیت انجام‌شده`;
+if(!data.tasks.length){box.innerHTML='<div class="empty">هنوز فعالیتی ثبت نشده است. از بخش دریافت فایل یا افزودن دستی شروع کن.</div>';return}
+days.forEach(day=>{let arr=data.tasks.filter(t=>t.day===day);if(!arr.length)return;let h=document.createElement('div');h.className='daytitle';h.textContent=day;box.append(h);arr.forEach(t=>{let i=data.tasks.indexOf(t),d=document.createElement('div');d.className='task'+(t.done?' done':'');d.innerHTML=`<input type="checkbox" ${t.done?'checked':''} aria-label="انجام شد"><div style="flex:1"><div class="taskname">${esc(t.subject)}: ${esc(t.title)}</div><div class="taskmeta">${t.date?'موعد: '+esc(t.date):'بدون تاریخ'}</div></div><button class="secondary" style="padding:6px 9px" aria-label="حذف">×</button>`;d.querySelector('input').onchange=e=>{data.tasks[i].done=e.target.checked;save();renderTasks()};d.querySelector('button').onclick=()=>{data.tasks.splice(i,1);save();renderTasks()};box.append(d)})})}
+$('addTask').onclick=()=>{let subject=$('taskSubject').value.trim(),title=$('taskTitle').value.trim();if(!subject||!title)return alert('نام درس و شرح فعالیت را وارد کن.');data.tasks.push({subject,title,day:$('taskDay').value,date:$('taskDate').value,done:false});save();$('taskTitle').value='';renderTasks()};
+function renderNotes(){$('noteList').innerHTML=data.notes.length?data.notes.map((n,i)=>`<div class="task"><div style="flex:1"><b>${esc(n.subject)}</b><div class="taskmeta">${esc(n.text)}</div></div><button class="secondary" onclick="delNote(${i})">حذف</button></div>`).join(''):'<div class="empty">یادداشتی ذخیره نشده است.</div>'}
+window.delNote=i=>{data.notes.splice(i,1);save();renderNotes()};
+$('saveNote').onclick=()=>{let subject=$('noteSubject').value.trim(),text=$('noteText').value.trim();if(!subject||!text)return alert('نام درس و توضیحات را وارد کن.');let i=data.notes.findIndex(n=>n.subject===subject);if(i>=0)data.notes[i].text=text;else data.notes.push({subject,text});save();$('noteText').value='';renderNotes()};
+function renderPlans(){$('planList').innerHTML=data.plans.length?data.plans.map((p,i)=>`<div class="task"><div style="flex:1"><b>${esc(p.time)} · ${esc(p.title)}</b><div class="taskmeta">${esc(p.type)} · ${p.repeat==='daily'?'هر روز':'یک‌بار'}</div></div><button class="secondary" onclick="delPlan(${i})">حذف</button></div>`).join(''):'<div class="empty">برنامه‌ای ثبت نشده است.</div>'}
+window.delPlan=i=>{data.plans.splice(i,1);save();renderPlans()};
+$('addPlan').onclick=()=>{let title=$('planTitle').value.trim(),time=$('planTime').value;if(!title||!time)return alert('عنوان و ساعت را وارد کن.');data.plans.push({title,time,type:$('planType').value,repeat:$('planRepeat').value,last:''});save();$('planTitle').value='';renderPlans()};
+$('enableNotify').onclick=async()=>{if(!('Notification'in window))return alert('این مرورگر اعلان را پشتیبانی نمی‌کند.');let p=await Notification.requestPermission();alert(p==='granted'?'اعلان‌ها فعال شدند. برنامه را برای دریافت یادآوری باز نگه دار.':'مجوز اعلان داده نشد.')};
+function checkAlarms(){if(!('Notification'in window)||Notification.permission!=='granted')return;let now=new Date(),hm=now.toTimeString().slice(0,5),today=now.toISOString().slice(0,10);data.plans.forEach(p=>{let key=today+' '+hm;if(p.time===hm&&p.last!==key){new Notification('یادآور درس‌یار',{body:p.title+' · '+p.type});p.last=key;if(p.repeat==='once')p.time='--:--';save();renderPlans()}})}
+setInterval(checkAlarms,15000);
+async function ocrImage(blob){if(!window.Tesseract)throw Error('کتابخانه تشخیص متن بارگیری نشد. اینترنت را بررسی کن.');let r=await Tesseract.recognize(blob,'fas+eng',{logger:m=>{$('fileStatus').textContent='تشخیص متن: '+Math.round((m.progress||0)*100)+'٪'}});return r.data.text}
+async function pdfText(file){if(!window.pdfjsLib)throw Error('ابزار خواندن PDF بارگیری نشد.');pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';let pdf=await pdfjsLib.getDocument({data:await file.arrayBuffer()}).promise,out='';for(let n=1;n<=pdf.numPages;n++){let page=await pdf.getPage(n),content=await page.getTextContent(),txt=content.items.map(x=>x.str).join(' ');if(txt.trim())out+=txt+'\\n';else{let vp=page.getViewport({scale:1.7}),canvas=document.createElement('canvas'),ctx=canvas.getContext('2d');canvas.width=vp.width;canvas.height=vp.height;await page.render({canvasContext:ctx,viewport:vp}).promise;out+=await ocrImage(await new Promise(res=>canvas.toBlob(res,'image/png')))+'\\n'}}return out}
+let extracted=[];
+function candidateLines(text){return text.split(/[\\n\\r]+/).map(x=>x.replace(/[•●▪]/g,'').trim()).filter(x=>x.length>5).filter(x=>!/(نام و نام خانوادگی|مدرسه|تاریخ|صفحه\\s*\\d+)/.test(x)).slice(0,60)}
+$('processFiles').onclick=async()=>{let files=[...$('fileInput').files];if(!files.length)return alert('اول PDF یا عکس را انتخاب کن.');$('fileStatus').textContent='در حال خواندن فایل‌ها...';$('extractResult').innerHTML='';extracted=[];for(let f of files){try{let txt=f.type==='application/pdf'?await pdfText(f):await ocrImage(f);extracted.push(...candidateLines(txt).map(line=>({file:f.name,text:line})));}catch(e){$('fileStatus').textContent='خطا: '+e.message;return}}$('fileStatus').textContent=extracted.length+' خط احتمالی پیدا شد. موارد درست را انتخاب کن و به جدول اضافه کن.';let host=$('extractResult');if(!extracted.length){host.innerHTML='<p class="small">متنی پیدا نشد. شاید فایل کیفیت پایینی دارد یا متن داخل آن به‌صورت تصویر پیچیده است.</p>';return}extracted.forEach((x,i)=>{let d=document.createElement('div');d.className='task';d.innerHTML=`<input type="checkbox" checked><div style="flex:1"><input value="${esc(x.text)}" style="margin:0"><div class="taskmeta">${esc(x.file)}</div></div>`;d.dataset.index=i;host.append(d)});let add=document.createElement('button');add.className='primary';add.textContent='افزودن موارد انتخاب‌شده';add.onclick=()=>{host.querySelectorAll('.task').forEach(el=>{if(el.querySelector('input[type=checkbox]').checked){let text=el.querySelector('input:not([type])').value.trim();if(text)data.tasks.push({subject:'درس مشخص نشده',title:text,day:'شنبه',date:'',done:false})}});save();renderTasks();alert('فعالیت‌ها به جدول اضافه شدند. نام درس و روز را می‌توانی ویرایش کنی.');document.querySelector('[data-tab=tasks]').click()};host.append(add)};
+if('serviceWorker'in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+renderTasks();renderNotes();renderPlans();
+</script>
+</body></html>
